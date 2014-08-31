@@ -1,0 +1,79 @@
+# paths
+# - target
+spath = src
+opath = $(bpath)/obj
+mpath = man
+
+# - sources
+ccsrc   = $(wildcard $(spath)/*.c)
+ccsrcc  = $(wildcard $(spath)/*.cc)
+ccsrcpp = $(wildcard $(spath)/*.cpp)
+
+# binarys
+objc   = $(ccsrc:.c=.o)
+objcc  = $(ccsrcc:.cc=.o)
+objcpp = $(ccsrcpp:.cpp=.o)
+obj    = $(objc) $(objcc) $(objcpp)
+
+bin = $(bpath)/$(pkgname)
+man = $(mpath)/$(pkgname).1
+
+MAKE = make
+CLEAR = clear
+COL = col
+LESS = less
+NROFF = nroff
+RM = rm
+INSTALL = install
+CC = gcc
+CXX = g++
+COFLAGS= $(opt) $(dbg) -D'VILE_VERSION="$(shell cat VERSION)"' -I/usr/local/include -Wall -fopenmp 
+CCFLAGS = -std=c89 -Wno-strict-aliasing -I$(spath) $(COFLAGS)
+CXXFLAGS = -ansi -pedantic -Wno-strict-aliasing -I$(spath) $(COFLAGS)
+TEXFLAGS = -output-directory=$(tpath)
+LDFLAGS = -lgomp `sdl-config --libs`
+
+$(bin): $(obj)
+	$(CXX) $(CXXFLAGS) $(obj) -o $@ $(LDFLAGS)
+
+%.o: %.c
+	$(CC) -c $(CCFLAGS) -o $@ $<
+
+%.o: %.cc
+	$(CXX) -c $(CXXFLAGS) -o $@ $<
+
+%.o: %.cpp
+	$(CXX) -c $(CXXFLAGS) -o $@ $<
+
+.PHONY: all
+all: $(bin)
+
+.PHONY: bin 
+bin: $(bin)
+
+.PHONY: doc
+doc:
+	$(MAKE) -C ./$(tpath)
+
+.PHONY: man-preview
+man-preview:
+	$(CLEAR)&& $(NROFF) -Tascii -man "man/xtracer.1" | $(COL) -x | $(LESS) -c
+
+.PHONY: install
+install: all
+	$(INSTALL)-m 775 $(bin) $(PREFIX)/bin/$(pkgname)
+	$(INSTALL)-c -m 444 $(man) $(PREFIX)/share/man/man1/$(pkgname).1
+		  
+.PHONY: uninstall
+uninstall:
+	$(RM)-f $(PREFIX)/bin/$(pkgname)
+	$(RM)-f $(PREFIX)/share/man/man1/$(pkgname).1
+
+
+.PHONY: clean
+clean:
+	$(RM) -rf $(obj)
+
+.PHONY: clean-all
+clean-all: clean
+	$(RM) -f Makefile $(bin)

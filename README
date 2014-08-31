@@ -1,0 +1,13 @@
+Vile
+----
+Copyright 2010, 2011 (c) Papadopoulos Nikos <nikpapas@gmail.com>
+
+About
+-----
+Vile is a wolfenstein clone.
+So far only the basic engine was written.
+The source code is freely distributed under the LGPL license.
+
+Dependencies
+------------
+* libsdl 
