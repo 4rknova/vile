@@ -20,7 +20,7 @@ int main(int argc, char **argv)
     Controller controller;
 	Camera cam;
     Renderer renderer;
-	Framebuffer fb(800, 600);
+	Framebuffer fb(900, 300);
 	Screen screen(fb);
 
 	if (screen.init()) {
